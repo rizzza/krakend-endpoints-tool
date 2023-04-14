@@ -57,7 +57,12 @@ func prependPrefix(obj any, prefix string, vhost bool) any {
 		endp = path.Join("__virtual", endp)
 	}
 
-	objMap["endpoint"] = "/" + endp
+	// prepend / if it's not there
+	if endp[0] != '/' {
+		endp = "/" + endp
+	}
+
+	objMap["endpoint"] = endp
 
 	return objMap
 }
