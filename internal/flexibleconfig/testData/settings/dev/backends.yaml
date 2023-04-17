@@ -1,8 +1,2 @@
-load_balancer_api:
+test_api_url:
   - http://host.docker.internal:7608
-
-# {
-#     "load_balancer_api": [
-#         "http://host.docker.internal:7608"
-#     ]
-# }

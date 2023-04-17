@@ -43,7 +43,7 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 
 			ext := filepath.Ext(settingsFile.Name())
 			if ext != ".json" && ext != ".yaml" {
-				return nil, fmt.Errorf("settings file %s must be of type .json or .yaml", settingsFile.Name())
+				return nil, fmt.Errorf("settings file %q read from %q is invalid: must be of type .json or .yaml", settingsFile.Name(), cfg.SettingsPath)
 			}
 
 			b, err := os.ReadFile(filepath.Join(cfg.SettingsPath, settingsFile.Name()))

@@ -13,5 +13,5 @@
   backend:
     - url_pattern: /v1/test/{testID}
       method: {{ include "get.tmpl" }}
-      host: &hosts {{ .backends.load_balancer_api }}
+      host: &hosts {{ .backends.test_api_url }}
       extra_config: &extraConfig {}
