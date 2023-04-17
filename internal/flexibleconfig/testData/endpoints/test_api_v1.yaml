@@ -1,0 +1,17 @@
+#### loadbalancers
+- $schema: https://www.krakend.io/schema/endpoint.json
+  $id: "#endpoint/endpoint"
+  endpoint: /v1/test/{testID}
+  method: {{ include "get.tmpl" }}
+  input_headers: &input_headers
+    - Authorization
+    - Content-Length
+    - Content-Type
+    - Host
+    - Infratographer-Auth
+  output_encoding: &outputEncoding no-op
+  backend:
+    - url_pattern: /v1/test/{testID}
+      method: {{ include "get.tmpl" }}
+      host: &hosts {{ .backends.load_balancer_api }}
+      extra_config: &extraConfig {}
