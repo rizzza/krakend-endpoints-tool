@@ -1,0 +1,15 @@
+{
+    "$schema": "https://www.krakend.io/schema/v3.json",
+    "version": 3,
+    "name": "my-krakend-instance",
+    "port": {{ env "KRAKEND_PORT" }},
+    "timeout": "{{ .service.timeout }}",
+    "cache_ttl": "{{ .service.timeout }}",
+    "output_encoding": "{{ .service.encoding }}",
+    "plugin": {
+        "pattern": ".so",
+        "folder": "/usr/lib/krakend/plugins/"
+    },
+    "endpoints": $ENDPOINTS$,
+    "extra_config": {}
+}

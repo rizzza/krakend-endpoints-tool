@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -9,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 	"gopkg.in/yaml.v3"
 )
 
@@ -42,6 +44,50 @@ func info(frmt string, args ...interface{}) {
 // parses an endpoint and returns the type of endpoint
 // and the parsed JSON object.
 func getEndpointAndType(path string) (endpointType, any, error) {
+	if os.Getenv("FC_ENABLE") == "1" {
+		// template requested endpoint file
+		ext := filepath.Ext(path)
+		tmpFile, err := os.CreateTemp("", fmt.Sprintf("KrakenD_parsed_template_*%s", ext))
+		if err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		defer func() {
+			tmpFile.Close()
+			os.Remove(tmpFile.Name())
+		}()
+
+		p, err := flexibleconfig.NewTemplateParser(flexibleconfig.Config{
+			SettingsPath: os.Getenv("FC_SETTINGS"),
+			PartialsPath: os.Getenv("FC_PARTIALS"),
+		})
+
+		if err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		b, err := os.ReadFile(path)
+		if err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		buf, err := p.Parse(bytes.NewBuffer(b))
+		if err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		_, err = tmpFile.Write(buf.Bytes())
+		if err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		if err := tmpFile.Close(); err != nil {
+			return unknownEndpoint, nil, err
+		}
+
+		path = tmpFile.Name()
+	}
+
 	// open the file
 	f, err := os.Open(path)
 	if err != nil {

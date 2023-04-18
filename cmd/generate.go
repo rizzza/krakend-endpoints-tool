@@ -4,10 +4,12 @@ Copyright © 2023 Infratographer Authors
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"strings"
 
+	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 	"github.com/spf13/cobra"
 )
 
@@ -60,12 +62,32 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 		return err
 	}
 
+	defer outfile.Close()
+
 	cfgbytes, err := os.ReadFile(cfg)
 	if err != nil {
 		return err
 	}
+	cfgBuf := bytes.NewBuffer(cfgbytes)
 
-	defer outfile.Close()
+	// template krakend config
+	if os.Getenv("FC_ENABLE") == "1" {
+		debug("Flexible config is enabled...")
+		p, err := flexibleconfig.NewTemplateParser(flexibleconfig.Config{
+			SettingsPath: os.Getenv("FC_SETTINGS"),
+			PartialsPath: os.Getenv("FC_PARTIALS"),
+		})
+
+		if err != nil {
+			return err
+		}
+
+		cfgBuf, err = p.Parse(cfgBuf)
+		if err != nil {
+			return err
+		}
+
+	}
 
 	endpts, err := parseEndpoints(endpoints, exceptions, vhost)
 	if err != nil {
@@ -78,7 +100,7 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 	}
 
 	replacer := strings.NewReplacer(id, strings.TrimSpace(stringBuffer.String()))
-	cfgfull := strings.TrimSpace(string(cfgbytes))
+	cfgfull := strings.TrimSpace(cfgBuf.String())
 	if _, err := replacer.WriteString(outfile, cfgfull); err != nil {
 		return fmt.Errorf("error writing the configuration: %w", err)
 	}

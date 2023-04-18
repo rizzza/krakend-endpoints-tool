@@ -5,11 +5,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"html/template"
 	"os"
 	"path"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"github.com/Masterminds/sprig/v3"
 	"gopkg.in/yaml.v3"
@@ -43,7 +43,7 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 
 			ext := filepath.Ext(settingsFile.Name())
 			if ext != ".json" && ext != ".yaml" {
-				return nil, fmt.Errorf("settings file %q read from %q is invalid: must be of type .json or .yaml", settingsFile.Name(), cfg.SettingsPath)
+				continue
 			}
 
 			b, err := os.ReadFile(filepath.Join(cfg.SettingsPath, settingsFile.Name()))
@@ -54,12 +54,12 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 			switch ext {
 			case ".json":
 				if err := json.Unmarshal(b, &v); err != nil {
-					return nil, fmt.Errorf("faield to unmarshal %s: %w", settingsFile.Name(), err)
+					return nil, fmt.Errorf("failed to unmarshal %s: %w", settingsFile.Name(), err)
 				}
 				t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".json")] = v
 			case ".yaml":
 				if err := yaml.Unmarshal(b, &v); err != nil {
-					return nil, fmt.Errorf("faield to unmarshal %s: %w", settingsFile.Name(), err)
+					return nil, fmt.Errorf("failed to unmarshal %s: %w", settingsFile.Name(), err)
 				}
 				t.Vars[strings.TrimSuffix(filepath.Base(settingsFile.Name()), ".yaml")] = v
 			}
@@ -73,22 +73,22 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 	return t, nil
 }
 
-func (t FlexibleConfig) Parse(endpointFile string) (bytes.Buffer, error) {
+func (t FlexibleConfig) Parse(tmplBuf *bytes.Buffer) (*bytes.Buffer, error) {
 	var (
 		buf bytes.Buffer
 	)
 
-	tmpl, err := template.New("endpoint").Funcs(t.funcMap).ParseFiles(endpointFile)
+	tmpl, err := template.New("endpoint").Funcs(t.funcMap).Parse(tmplBuf.String())
 	if err != nil {
-		return buf, fmt.Errorf("failed to parse endpoint file %s: %w", endpointFile, err)
+		return &buf, fmt.Errorf("failed to parse template text: %w", err)
 	}
 
-	err = tmpl.ExecuteTemplate(&buf, filepath.Base(endpointFile), t.Vars)
+	err = tmpl.Execute(&buf, t.Vars)
 	if err != nil {
-		return buf, fmt.Errorf("failure executing template: %w", err)
+		return &buf, fmt.Errorf("failure executing template: %w", err)
 	}
 
-	return buf, nil
+	return &buf, nil
 }
 
 func (FlexibleConfig) marshal(v interface{}) string {

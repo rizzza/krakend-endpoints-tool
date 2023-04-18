@@ -1,1 +1,2 @@
 encoding: json
+timeout: 3s
