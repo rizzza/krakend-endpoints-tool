@@ -38,4 +38,5 @@ func TestHappyFlexibleConfig(t *testing.T) {
 	assert.Contains(t, string(buf), `"timeout": "3s"`)
 	assert.Contains(t, string(buf), `"cache_ttl": "3s"`)
 	assert.Contains(t, string(buf), `"output_encoding": "json"`)
+	assert.Contains(t, string(buf), `"port": {{ env "KRAKEND_PORT"}}`, "env templating should not be replaced")
 }

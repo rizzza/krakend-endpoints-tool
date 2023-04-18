@@ -69,6 +69,7 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 	t.funcMap = sprig.GenericFuncMap()
 	t.funcMap["marshal"] = t.marshal
 	t.funcMap["include"] = t.include
+	t.funcMap["env"] = t.env
 
 	return t, nil
 }
@@ -107,4 +108,10 @@ func (t FlexibleConfig) include(v interface{}) string {
 	}
 
 	return string(a)
+}
+
+func (t FlexibleConfig) env(v interface{}) string {
+	// {{ env "KRAKEND_PORT"}} and other environment must be a no-op to lay
+	// down environment from the container running krakend
+	return fmt.Sprintf(`{{ env "%v"}}`, v)
 }
