@@ -10,8 +10,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 	yaml "gopkg.in/yaml.v3"
+
+	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 )
 
 var (
@@ -61,7 +62,6 @@ func getEndpointAndType(path string) (endpointType, any, error) {
 			SettingsPath: os.Getenv("FC_SETTINGS"),
 			PartialsPath: os.Getenv("FC_PARTIALS"),
 		})
-
 		if err != nil {
 			return unknownEndpoint, nil, err
 		}

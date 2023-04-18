@@ -10,6 +10,8 @@ import (
 )
 
 func TestFlexibleConfig(t *testing.T) {
+	t.Parallel()
+
 	b, err := os.ReadFile("./testData/endpoints/test_api_v1.yaml")
 	require.Nil(t, err)
 

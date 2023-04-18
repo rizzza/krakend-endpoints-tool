@@ -5,12 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/infratographer/krakend-endpoints-tool/cmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/infratographer/krakend-endpoints-tool/cmd"
 )
 
-// nolint:paralleltest
+//nolint:paralleltest // environment may clobber
 func TestHappyPath(t *testing.T) {
 	endpointsDir := "scenarios/happy-path"
 	cfg := "scenarios/happy-path/krakend.tmpl"
@@ -19,7 +20,7 @@ func TestHappyPath(t *testing.T) {
 	assert.NoError(t, err, "should not fail")
 }
 
-// nolint:paralleltest
+//nolint:paralleltest // environment may clobber
 func TestHappyFlexibleConfig(t *testing.T) {
 	t.Setenv("FC_ENABLE", "1")
 	t.Setenv("FC_SETTINGS", "../internal/flexibleconfig/testData/settings/dev")

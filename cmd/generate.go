@@ -9,8 +9,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 	"github.com/spf13/cobra"
+
+	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
 )
 
 // generateCmd represents the generate command.
@@ -77,7 +78,6 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 			SettingsPath: os.Getenv("FC_SETTINGS"),
 			PartialsPath: os.Getenv("FC_PARTIALS"),
 		})
-
 		if err != nil {
 			return err
 		}
@@ -86,7 +86,6 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 		if err != nil {
 			return err
 		}
-
 	}
 
 	endpts, err := parseEndpoints(endpoints, exceptions, vhost)
