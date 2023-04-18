@@ -73,7 +73,7 @@ func getEndpointAndType(path string) (endpointType, any, error) {
 
 		buf, err := p.Parse(bytes.NewBuffer(b))
 		if err != nil {
-			return unknownEndpoint, nil, err
+			return unknownEndpoint, nil, fmt.Errorf("failed to template %q: %w", path, err)
 		}
 
 		_, err = tmpFile.Write(buf.Bytes())

@@ -83,7 +83,7 @@ func (t FlexibleConfig) Parse(tmplBuf *bytes.Buffer) (*bytes.Buffer, error) {
 
 	err = tmpl.Execute(&buf, t.Vars)
 	if err != nil {
-		return &buf, fmt.Errorf("failure executing template: %w", err)
+		return &buf, fmt.Errorf("failed to execute template: %w", err)
 	}
 
 	return &buf, nil
