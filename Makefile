@@ -13,7 +13,7 @@ GOLANGCI_LINT_VERSION = v1.50.1
 .PHONY: test
 test:
 	@echo "Running tests..."
-	@go test -v ./tests/...
+	@go test -v ./...
 
 .PHONY: build
 build:
