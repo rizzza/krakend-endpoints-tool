@@ -5,15 +5,13 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/infratographer/krakend-endpoints-tool/cmd"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/infratographer/krakend-endpoints-tool/cmd"
 )
 
+// nolint:paralleltest
 func TestHappyPath(t *testing.T) {
-	t.Parallel()
-
 	endpointsDir := "scenarios/happy-path"
 	cfg := "scenarios/happy-path/krakend.tmpl"
 	outf := filepath.Join(t.TempDir(), "krakend.tmpl")
@@ -21,28 +19,16 @@ func TestHappyPath(t *testing.T) {
 	assert.NoError(t, err, "should not fail")
 }
 
+// nolint:paralleltest
 func TestHappyFlexibleConfig(t *testing.T) {
-	t.Parallel()
-
-	err := os.Setenv("FC_ENABLE", "1")
-	require.Nil(t, err)
-
-	err = os.Setenv("FC_SETTINGS", "../internal/flexibleconfig/testData/settings/dev")
-	require.Nil(t, err)
-
-	err = os.Setenv("FC_PARTIALS", "../internal/flexibleconfig/testData/partials")
-	require.Nil(t, err)
-
-	defer func() {
-		os.Unsetenv("FC_ENABLE")
-		os.Unsetenv("FC_SETTINGS")
-		os.Unsetenv("FC_PARTIALS")
-	}()
+	t.Setenv("FC_ENABLE", "1")
+	t.Setenv("FC_SETTINGS", "../internal/flexibleconfig/testData/settings/dev")
+	t.Setenv("FC_PARTIALS", "../internal/flexibleconfig/testData/partials")
 
 	endpointsDir := "../internal/flexibleconfig/testData/endpoints"
 	cfg := "scenarios/flexibleconfig/krakend.tmpl"
 	outf := filepath.Join(t.TempDir(), "krakend.tmpl")
-	err = cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", false)
+	err := cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", false)
 	require.Nil(t, err, "should not fail")
 
 	buf, err := os.ReadFile(outf)

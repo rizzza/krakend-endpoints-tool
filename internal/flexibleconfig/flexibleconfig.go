@@ -11,8 +11,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/Masterminds/sprig/v3"
-	"gopkg.in/yaml.v3"
+	sprig "github.com/Masterminds/sprig/v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 type FlexibleConfig struct {
@@ -74,9 +74,7 @@ func NewTemplateParser(cfg Config) (*FlexibleConfig, error) {
 }
 
 func (t FlexibleConfig) Parse(tmplBuf *bytes.Buffer) (*bytes.Buffer, error) {
-	var (
-		buf bytes.Buffer
-	)
+	var buf bytes.Buffer
 
 	tmpl, err := template.New("endpoint").Funcs(t.funcMap).Parse(tmplBuf.String())
 	if err != nil {
@@ -92,11 +90,21 @@ func (t FlexibleConfig) Parse(tmplBuf *bytes.Buffer) (*bytes.Buffer, error) {
 }
 
 func (FlexibleConfig) marshal(v interface{}) string {
-	a, _ := json.Marshal(v)
+	a, err := json.Marshal(v)
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
 	return string(a)
 }
 
 func (t FlexibleConfig) include(v interface{}) string {
-	a, _ := os.ReadFile(path.Join(t.Partials, v.(string)))
+	a, err := os.ReadFile(path.Join(t.Partials, v.(string)))
+	if err != nil {
+		fmt.Println(err)
+		return ""
+	}
+
 	return string(a)
 }

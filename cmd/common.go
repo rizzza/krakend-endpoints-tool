@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/infratographer/krakend-endpoints-tool/internal/flexibleconfig"
-	"gopkg.in/yaml.v3"
+	yaml "gopkg.in/yaml.v3"
 )
 
 var (

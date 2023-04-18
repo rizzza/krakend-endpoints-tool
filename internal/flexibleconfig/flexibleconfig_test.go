@@ -14,6 +14,8 @@ func TestFlexibleConfig(t *testing.T) {
 	require.Nil(t, err)
 
 	t.Run("templates settings config", func(t *testing.T) {
+		t.Parallel()
+
 		cfg := Config{
 			SettingsPath: "./testData/settings/dev",
 		}
@@ -28,6 +30,8 @@ func TestFlexibleConfig(t *testing.T) {
 	})
 
 	t.Run("templates partials config", func(t *testing.T) {
+		t.Parallel()
+
 		cfg := Config{
 			PartialsPath: "./testData/partials",
 		}
