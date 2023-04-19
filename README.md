@@ -10,7 +10,7 @@ endpoints in a directory structure.
 Note that this assumes that Krakend.io's [flexible configuration](
 https://www.krakend.io/docs/configuration/flexible-config/) is used.
 
-To enable flexible configuration, pass in environment `FC_ENABLE=1`, `FC_SETTINGS=/path/to/settings/files`, `FC_PARTIALS=/path/to/partials/files`
+To enable flexible configuration, pass in environment `FC_SETTINGS=/path/to/settings/files`, `FC_PARTIALS=/path/to/partials/files` and add the `--fcenable` flag.
 
 ## Usage
 

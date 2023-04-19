@@ -44,8 +44,8 @@ func info(frmt string, args ...interface{}) {
 
 // parses an endpoint and returns the type of endpoint
 // and the parsed JSON object.
-func getEndpointAndType(path string) (endpointType, any, error) {
-	if os.Getenv("FC_ENABLE") == "1" {
+func getEndpointAndType(path string, fcEnable bool) (endpointType, any, error) {
+	if fcEnable {
 		// template requested endpoint file
 		ext := filepath.Ext(path)
 		tmpFile, err := os.CreateTemp("", fmt.Sprintf("KrakenD_parsed_template_*%s", ext))
@@ -177,7 +177,7 @@ func shouldBeSkipped(path string, d fs.DirEntry, exceptions []string) bool {
 	return false
 }
 
-func WalkEndpoints(endpoints string, exceptions []string, f execFunc) error {
+func WalkEndpoints(endpoints string, exceptions []string, fcEnable bool, f execFunc) error {
 	return filepath.WalkDir(endpoints, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -190,7 +190,7 @@ func WalkEndpoints(endpoints string, exceptions []string, f execFunc) error {
 
 		debug("processing %s", green(path))
 
-		typ, obj, err := getEndpointAndType(path)
+		typ, obj, err := getEndpointAndType(path, fcEnable)
 		if err != nil {
 			return err
 		}

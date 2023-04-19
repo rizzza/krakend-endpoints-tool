@@ -37,6 +37,7 @@ func init() {
 	generateCmd.Flags().StringP("output", "o", "-", "output file. defaults to stdout")
 	generateCmd.Flags().StringP("identifier", "i", "$ENDPOINTS$", "identifier for the endpoints in the template")
 	generateCmd.Flags().BoolP("vhost", "v", false, "prepend the vhost to the endpoint")
+	generateCmd.Flags().BoolP("fcenable", "f", false, "enable flexible configuration templating support")
 }
 
 func generateMain(cmd *cobra.Command, args []string) error {
@@ -45,11 +46,12 @@ func generateMain(cmd *cobra.Command, args []string) error {
 	outf := cmd.Flag("output").Value.String()
 	id := cmd.Flag("identifier").Value.String()
 	vhost := cmd.Flag("vhost").Value.String() == "true"
+	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
 
-	return Generate(endpoints, cfg, outf, id, vhost)
+	return Generate(endpoints, cfg, outf, id, vhost, fcEnable)
 }
 
-func Generate(endpoints, cfg, outf, id string, vhost bool) error {
+func Generate(endpoints, cfg, outf, id string, vhost, fcEnable bool) error {
 	if endpoints == "" {
 		return fmt.Errorf("endpoints directory is required")
 	}
@@ -72,7 +74,7 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 	cfgBuf := bytes.NewBuffer(cfgbytes)
 
 	// template krakend config
-	if os.Getenv("FC_ENABLE") == "1" {
+	if fcEnable {
 		debug("Flexible config is enabled...")
 		p, err := flexibleconfig.NewTemplateParser(flexibleconfig.Config{
 			SettingsPath: os.Getenv("FC_SETTINGS"),
@@ -88,7 +90,7 @@ func Generate(endpoints, cfg, outf, id string, vhost bool) error {
 		}
 	}
 
-	endpts, err := parseEndpoints(endpoints, exceptions, vhost)
+	endpts, err := parseEndpoints(endpoints, exceptions, vhost, fcEnable)
 	if err != nil {
 		return err
 	}

@@ -31,6 +31,7 @@ func init() {
 
 	aggregateCmd.Flags().StringP("output", "o", "-", "output file. defaults to stdout")
 	aggregateCmd.Flags().BoolP("vhost", "v", false, "prepend the vhost to the endpoint")
+	aggregateCmd.Flags().BoolP("fcenable", "f", false, "enable flexible configuration templating support")
 }
 
 func prependPrefix(obj any, prefix string, vhost bool) any {
@@ -67,9 +68,9 @@ func prependPrefix(obj any, prefix string, vhost bool) any {
 	return objMap
 }
 
-func parseEndpoints(endpoints string, exceptions []string, vhost bool) ([]any, error) {
+func parseEndpoints(endpoints string, exceptions []string, vhost, fcEnable bool) ([]any, error) {
 	endpts := []any{}
-	err := WalkEndpoints(endpoints, exceptions, func(path string, typ endpointType, obj any, prefix string) error {
+	err := WalkEndpoints(endpoints, exceptions, fcEnable, func(path string, typ endpointType, obj any, prefix string) error {
 		switch typ {
 		case arrayEndpoint:
 			endptArr, ok := obj.([]any)
@@ -102,10 +103,12 @@ func aggregateMain(cmd *cobra.Command, args []string) error {
 	endpoints := cmd.Flag("endpoints").Value.String()
 	outf := cmd.Flag("output").Value.String()
 	vhost := cmd.Flag("vhost").Value.String() == "true"
-	return aggregate(endpoints, outf, vhost)
+	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
+
+	return aggregate(endpoints, outf, vhost, fcEnable)
 }
 
-func aggregate(endpoints, outf string, vhost bool) error {
+func aggregate(endpoints, outf string, vhost, fcEnable bool) error {
 	if endpoints == "" {
 		return fmt.Errorf("endpoints directory is required")
 	}
@@ -119,7 +122,7 @@ func aggregate(endpoints, outf string, vhost bool) error {
 
 	fmt.Println("# Aggregating endpoints in", green(endpoints))
 
-	endpts, err := parseEndpoints(endpoints, exceptions, vhost)
+	endpts, err := parseEndpoints(endpoints, exceptions, vhost, fcEnable)
 	if err != nil {
 		return err
 	}

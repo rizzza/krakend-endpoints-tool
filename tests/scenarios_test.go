@@ -11,25 +11,26 @@ import (
 	"github.com/infratographer/krakend-endpoints-tool/cmd"
 )
 
-//nolint:paralleltest // environment may clobber
+//nolint:paralleltest // go test panics when using Setenv with Parallel
 func TestHappyPath(t *testing.T) {
 	endpointsDir := "scenarios/happy-path"
 	cfg := "scenarios/happy-path/krakend.tmpl"
 	outf := filepath.Join(t.TempDir(), "krakend.tmpl")
-	err := cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", false)
+	fcEnable, vhost := false, false
+	err := cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", vhost, fcEnable)
 	assert.NoError(t, err, "should not fail")
 }
 
-//nolint:paralleltest // environment may clobber
+//nolint:paralleltest // go test panics when using Setenv with Parallel
 func TestHappyFlexibleConfig(t *testing.T) {
-	t.Setenv("FC_ENABLE", "1")
 	t.Setenv("FC_SETTINGS", "../internal/flexibleconfig/testData/settings/dev")
 	t.Setenv("FC_PARTIALS", "../internal/flexibleconfig/testData/partials")
 
 	endpointsDir := "../internal/flexibleconfig/testData/endpoints"
 	cfg := "scenarios/flexibleconfig/krakend.tmpl"
 	outf := filepath.Join(t.TempDir(), "krakend.tmpl")
-	err := cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", false)
+	fcEnable, vhost := true, false
+	err := cmd.Generate(endpointsDir, cfg, outf, "$ENDPOINTS$", vhost, fcEnable)
 	require.Nil(t, err, "should not fail")
 
 	buf, err := os.ReadFile(outf)

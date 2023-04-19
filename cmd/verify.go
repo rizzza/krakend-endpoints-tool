@@ -22,6 +22,7 @@ var verifyCmd = &cobra.Command{
 //nolint:gochecknoinits // this is a cobra command
 func init() {
 	rootCmd.AddCommand(verifyCmd)
+	verifyCmd.Flags().BoolP("fcenable", "f", false, "enable flexible configuration templating support")
 }
 
 func validateObj(path string, obj any, endptldr gojsonschema.JSONLoader) error {
@@ -59,10 +60,11 @@ func validateArray(path string, arr []any, endptldr gojsonschema.JSONLoader) err
 
 func verifyMain(cmd *cobra.Command, args []string) error {
 	endpoints := cmd.Flag("endpoints").Value.String()
-	return verify(endpoints)
+	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
+	return verify(endpoints, fcEnable)
 }
 
-func verify(endpoints string) error {
+func verify(endpoints string, fcEnable bool) error {
 	if endpoints == "" {
 		return fmt.Errorf("endpoints directory is required")
 	}
@@ -73,7 +75,7 @@ func verify(endpoints string) error {
 		return fmt.Errorf("invalid endpoint schema")
 	}
 
-	err := WalkEndpoints(endpoints, []string{}, func(path string, typ endpointType, obj any, _ string) error {
+	err := WalkEndpoints(endpoints, []string{}, fcEnable, func(path string, typ endpointType, obj any, _ string) error {
 		switch typ {
 		case arrayEndpoint:
 			objAny, ok := obj.([]any)
