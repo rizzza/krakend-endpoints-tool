@@ -60,7 +60,7 @@ func validateArray(path string, arr []any, endptldr gojsonschema.JSONLoader) err
 
 func verifyMain(cmd *cobra.Command, args []string) error {
 	endpoints := cmd.Flag("endpoints").Value.String()
-	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
+	fcEnable := cmd.Flag("fcenable").Value.String() == TRUE
 	return verify(endpoints, fcEnable)
 }
 

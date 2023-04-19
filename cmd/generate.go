@@ -45,8 +45,8 @@ func generateMain(cmd *cobra.Command, args []string) error {
 	cfg := cmd.Flag("config").Value.String()
 	outf := cmd.Flag("output").Value.String()
 	id := cmd.Flag("identifier").Value.String()
-	vhost := cmd.Flag("vhost").Value.String() == "true"
-	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
+	vhost := cmd.Flag("vhost").Value.String() == TRUE
+	fcEnable := cmd.Flag("fcenable").Value.String() == TRUE
 
 	return Generate(endpoints, cfg, outf, id, vhost, fcEnable)
 }

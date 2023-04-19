@@ -28,6 +28,7 @@ const (
 	arrayEndpoint   endpointType = "array"
 	objectEndpoint  endpointType = "object"
 	unknownEndpoint endpointType = "unknown"
+	TRUE            string       = "true"
 )
 
 func debug(frmt string, args ...interface{}) {

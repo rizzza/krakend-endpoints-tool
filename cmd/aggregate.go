@@ -70,28 +70,29 @@ func prependPrefix(obj any, prefix string, vhost bool) any {
 
 func parseEndpoints(endpoints string, exceptions []string, vhost, fcEnable bool) ([]any, error) {
 	endpts := []any{}
-	err := WalkEndpoints(endpoints, exceptions, fcEnable, func(path string, typ endpointType, obj any, prefix string) error {
-		switch typ {
-		case arrayEndpoint:
-			endptArr, ok := obj.([]any)
-			if !ok {
-				return fmt.Errorf("unexpected error: expected array of endpoints, got %T", obj)
+	err := WalkEndpoints(endpoints, exceptions, fcEnable,
+		func(path string, typ endpointType, obj any, prefix string) error {
+			switch typ {
+			case arrayEndpoint:
+				endptArr, ok := obj.([]any)
+				if !ok {
+					return fmt.Errorf("unexpected error: expected array of endpoints, got %T", obj)
+				}
+
+				for i, endpt := range endptArr {
+					endptArr[i] = prependPrefix(endpt, prefix, vhost)
+				}
+
+				endpts = append(endpts, endptArr...)
+			case objectEndpoint:
+				obj := prependPrefix(obj, prefix, vhost)
+				endpts = append(endpts, obj)
+			default:
+				return fmt.Errorf("unknown endpoint type: %s", path)
 			}
 
-			for i, endpt := range endptArr {
-				endptArr[i] = prependPrefix(endpt, prefix, vhost)
-			}
-
-			endpts = append(endpts, endptArr...)
-		case objectEndpoint:
-			obj := prependPrefix(obj, prefix, vhost)
-			endpts = append(endpts, obj)
-		default:
-			return fmt.Errorf("unknown endpoint type: %s", path)
-		}
-
-		return nil
-	})
+			return nil
+		})
 	if err != nil {
 		return nil, err
 	}
@@ -102,8 +103,8 @@ func parseEndpoints(endpoints string, exceptions []string, vhost, fcEnable bool)
 func aggregateMain(cmd *cobra.Command, args []string) error {
 	endpoints := cmd.Flag("endpoints").Value.String()
 	outf := cmd.Flag("output").Value.String()
-	vhost := cmd.Flag("vhost").Value.String() == "true"
-	fcEnable := cmd.Flag("fcenable").Value.String() == "true"
+	vhost := cmd.Flag("vhost").Value.String() == TRUE
+	fcEnable := cmd.Flag("fcenable").Value.String() == TRUE
 
 	return aggregate(endpoints, outf, vhost, fcEnable)
 }
