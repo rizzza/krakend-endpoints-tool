@@ -1,3 +1,0 @@
-test_api_url:
-  - http://host.docker.internal:7608
-method: GET

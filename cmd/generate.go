@@ -7,6 +7,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -100,7 +101,12 @@ func Generate(endpoints, cfg, outf, id string, vhost, fcEnable bool) error {
 		return fmt.Errorf("error persisting the endpoints: %w", err)
 	}
 
-	replacer := strings.NewReplacer(id, strings.TrimSpace(stringBuffer.String()))
+	// remove escaped env quotes -- {{ env \"E_VAR\" }} -- krakend can not parse and substitute
+	// environment variables, if escaped
+	re := regexp.MustCompile(`env\s+\\"(.+)\\"`)
+	cfgStr := re.ReplaceAllString(stringBuffer.String(), `env "$1"`)
+
+	replacer := strings.NewReplacer(id, strings.TrimSpace(cfgStr))
 	cfgfull := strings.TrimSpace(cfgBuf.String())
 	if _, err := replacer.WriteString(outfile, cfgfull); err != nil {
 		return fmt.Errorf("error writing the configuration: %w", err)

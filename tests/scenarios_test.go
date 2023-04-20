@@ -35,9 +35,10 @@ func TestHappyFlexibleConfig(t *testing.T) {
 
 	buf, err := os.ReadFile(outf)
 	require.Nil(t, err)
-	assert.Contains(t, string(buf), `"method": "GET"`)
-	assert.Contains(t, string(buf), `"timeout": "3s"`)
-	assert.Contains(t, string(buf), `"cache_ttl": "3s"`)
-	assert.Contains(t, string(buf), `"output_encoding": "json"`)
-	assert.Contains(t, string(buf), `"port": {{ env "KRAKEND_PORT"}}`, "env templating should not be replaced")
+	assert.Contains(t, string(buf), `"method": "GET"`, "GET partial.tmpl should be templated")
+	assert.Contains(t, string(buf), `"timeout": "3s"`, "timeout setting should be templated")
+	assert.Contains(t, string(buf), `"cache_ttl": "3s"`, "cache_ttl setting should be templated")
+	assert.Contains(t, string(buf), `"output_encoding": "json"`, "output_encoding setting should be templated")
+	assert.Contains(t, string(buf), `{{ env "KRAKEND_PORT"}}`, "env templating should not be replaced")
+	assert.Contains(t, string(buf), `{{ env "TEST_API_URL"}}`, "env templating should not be replaced")
 }
