@@ -28,7 +28,7 @@ func TestFlexibleConfig(t *testing.T) {
 		buf, err := p.Parse(bytes.NewBuffer(b))
 		require.Nil(t, err)
 		assert.NotNil(t, buf)
-		assert.Contains(t, buf.String(), "&hosts [http://host.docker.internal:7608]")
+		assert.Contains(t, buf.String(), "method: GET")
 	})
 
 	t.Run("templates partials config", func(t *testing.T) {
@@ -44,6 +44,6 @@ func TestFlexibleConfig(t *testing.T) {
 		buf, err := p.Parse(bytes.NewBuffer(b))
 		require.Nil(t, err)
 		assert.NotNil(t, buf)
-		assert.Contains(t, buf.String(), "method: GET")
+		assert.Contains(t, buf.String(), "method: PATCH")
 	})
 }
